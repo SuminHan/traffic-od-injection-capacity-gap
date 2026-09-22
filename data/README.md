@@ -31,8 +31,8 @@ access/download process). This describes what each dataset is and where to get i
   directory) to route OD flow onto sensors (Section 4.2 of the paper).
 - South Korea's national standard node-link road network dataset (표준노드링크), maintained by
   ITS Korea / the Ministry of Land, Infrastructure and Transport:
-  - [ITS Korea 표준노드링크 (National Transport Information Center)](https://www.its.go.kr/nodelink/)
-  - [전국표준노드링크 자료실](https://www.its.go.kr/nodelink/nodelinkRef)
+  - [전국표준노드링크 자료실 (ITS Korea)](https://www.its.go.kr/nodelink/nodelinkRef) — the download page
+  - [ITS Korea 표준노드링크 landing page](https://www.its.go.kr/nodelink/)
   - Mirrored on the national portal: [국토교통부_표준노드링크 | 공공데이터포털](https://www.data.go.kr/data/15025526/fileData.do)
 
 ## Directory layout the preprocessing scripts expect
