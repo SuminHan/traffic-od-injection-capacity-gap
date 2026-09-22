@@ -3,7 +3,7 @@
 treatment; output speed_tensor_ext.npz mirrors traffic_tensor_ext.npz's naming convention."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 vc = np.load(f"{GTS}/speed_hourly_cache_ext.npz", allow_pickle=True)
 link_ids = list(vc["link_ids"])

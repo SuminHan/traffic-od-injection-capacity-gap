@@ -1,6 +1,6 @@
 """
 Published-baseline architectures (DCRNN, Graph WaveNet, GMAN), adapted from smhan's clean
-standalone reimplementations at /home/smhan/uve_experiment/deep_baselines/{dcrnn,gwnet,gman}.py
+standalone reimplementations at /path/to/raw_data/deep_baselines/{dcrnn,gwnet,gman}.py
 (themselves distilled from the LibCity reference implementations -- see that directory's
 REFERENCES.md). Those originals target a DIFFERENT task (174 stations, daily P=14/Q=1 direct
 next-day regression); this file keeps every core mechanism (diffusion convolution / WaveNet

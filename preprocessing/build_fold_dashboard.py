@@ -1,6 +1,6 @@
 import json, os
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 RUNS = ["foldtopk5", "foldtopk10", "foldtopk15", "foldtopk30", "foldtopk60", "foldtopk120",
         "foldtopk250", "folddense", "foldnotime_topk15"]
 

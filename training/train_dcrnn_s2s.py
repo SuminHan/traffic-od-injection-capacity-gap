@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from train_gts_od import KR_HOLIDAYS, TIME_FEAT_DIM, build_windows
 from models_baselines import DCRNNSeq2Seq
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 
 def get_args():

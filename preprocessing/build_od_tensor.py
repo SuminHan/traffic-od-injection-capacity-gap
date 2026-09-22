@@ -12,7 +12,7 @@ import geopandas as gpd
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+SC = "/home/ncrc/work"
 MOVE_DIR = f"{SC}/movement_202607"
 OUT_DIR = f"{SC}/gts"
 t0 = time.time()

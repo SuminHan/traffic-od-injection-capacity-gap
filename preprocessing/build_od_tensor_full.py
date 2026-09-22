@@ -1,6 +1,6 @@
 """
 Build the full (day, hour, 500, 500) OD tensor for 2023-01-01 .. 2026-08-31 (whatever days
-actually downloaded successfully under /home/smhan/uve_experiment/movement_od/), reusing the
+actually downloaded successfully under /path/to/raw_data/movement_od/), reusing the
 FIXED 500-node codeset already established from the July 2026 build (no redundant code-scan
 pass) and parallelizing per-day aggregation across cores.
 """
@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 from multiprocessing import Pool
 
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
-MOVE_ROOT = "/home/smhan/uve_experiment/movement_od"
+SC = "/home/ncrc/work/gts"
+MOVE_ROOT = "/path/to/raw_data/movement_od"
 N_WORKERS = 20
 
 d0 = np.load(f"{SC}/od_tensor_202607.npz", allow_pickle=True)

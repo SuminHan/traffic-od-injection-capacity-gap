@@ -15,7 +15,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 # --- OD anomaly magnitude per (sensor_link_id, global_hour) ---
 rs = np.load(f"{GTS}/routed_od_signal.npz", allow_pickle=True)

@@ -15,9 +15,9 @@ from pyproj import Transformer
 from shapely.ops import unary_union
 import heapq
 
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+SC = "/home/ncrc/work"
 GTS = f"{SC}/gts"
-NL = "/home/smhan/uve_experiment/seoul_buildings/nodelink"
+NL = "/path/to/raw_data/seoul_buildings/nodelink"
 BBOX = (-10052.5, 477236.5, 275064.6, 632421.6)
 ALPHA = 0.9
 RANK_BASE = {"101": 0.50, "102": 0.60, "103": 0.75, "104": 0.95, "105": 0.90, "106": 0.95, "107": 1.00}

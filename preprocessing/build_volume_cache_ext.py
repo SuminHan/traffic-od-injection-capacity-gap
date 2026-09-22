@@ -12,9 +12,9 @@ import re
 import numpy as np
 import pandas as pd
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
-TOPIS_DIR = "/home/smhan/uve_experiment/topis_volume"
-SRC_CACHE = "/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz"
+GTS = "/home/ncrc/work/gts"
+TOPIS_DIR = "/path/to/raw_data/topis_volume"
+SRC_CACHE = "/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz"
 
 VOL_HOURS = [f"{i}시" for i in range(24)]
 SHEET_RE = re.compile(r"^\d{4}년 \d{2}월$")

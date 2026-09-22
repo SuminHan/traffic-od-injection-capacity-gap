@@ -259,7 +259,7 @@ def main():
     args = get_args()
     torch.manual_seed(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+    SC = "/home/ncrc/work/gts"
     out_dir = f"{SC}/{args.out}"
     os.makedirs(out_dir, exist_ok=True)
 

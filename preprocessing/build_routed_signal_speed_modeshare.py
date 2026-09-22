@@ -2,7 +2,7 @@
 a routed signal aligned to the 396 speed-sensor links."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 TRAFFIC_DAYS = 1096  # speed_tensor.npz covers 2023-01-01..2025-12-31 (36 months, like the original volume run)
 
 rw = np.load(f"{GTS}/routing_weights_speed_modeshare.npz", allow_pickle=True)

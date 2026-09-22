@@ -6,7 +6,7 @@ routed_od_signal_multipath_ext.npz when --routing_source multipath --dataset_suf
 didn't exist yet (only the non-extended 1096-day routed_od_signal_multipath.npz did)."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 TRAFFIC_DAYS = 1308
 
 rw = np.load(f"{GTS}/routing_weights_multipath.npz", allow_pickle=True)

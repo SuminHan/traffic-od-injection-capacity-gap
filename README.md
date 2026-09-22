@@ -105,8 +105,9 @@ paper/           main.pdf (19p) + supplement.pdf (Appendices A-E, 4p), split per
 This is research code accumulated over the project, not a packaged library. In particular:
 
 - Path constants at the top of each `preprocessing/` and `training/` script are hardcoded to our
-  own server layout (`/home/ncrc/work/gts`, plus a collaborator's raw-data directory). Adjust
-  these before running.
+  own server layout (`/home/ncrc/work/gts`). Raw-data paths that pointed at a collaborator's
+  personal directory have been replaced with the placeholder `/path/to/raw_data` -- point that at
+  wherever you've put the datasets described in `data/README.md`. Adjust both before running.
 - No `requirements.txt`-pinned single environment — the project used several conda environments
   for different steps (PyTorch training vs. geopandas/matplotlib for figures). A best-effort
   `requirements.txt` is included; expect to need `geopandas` separately for

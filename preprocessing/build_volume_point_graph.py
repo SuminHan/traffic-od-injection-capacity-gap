@@ -7,12 +7,12 @@ import numpy as np
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 K = 4
 
 tt = np.load(f"{GTS}/traffic_tensor.npz", allow_pickle=True)
 link_ids = list(tt["link_ids"])
-vc = np.load("/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
+vc = np.load("/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
 vc_ids = list(vc["link_ids"])
 vc_pos = {lid: i for i, lid in enumerate(vc_ids)}
 t_proj = Transformer.from_crs("EPSG:4326", "EPSG:5186", always_xy=True)

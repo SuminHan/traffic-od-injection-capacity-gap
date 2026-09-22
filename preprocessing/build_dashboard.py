@@ -1,7 +1,7 @@
 import json, os, glob
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 RUNS = ["sweep_topk5", "sweep_topk10", "sweep_topk15", "sweep_topk30", "sweep_topk60",
         "sweep_topk120", "sweep_topk250", "sweep_dense", "sweep_notime_topk15"]
 

@@ -22,9 +22,9 @@ from pyproj import Transformer
 from shapely.ops import unary_union
 
 t0 = time.time()
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+SC = "/home/ncrc/work"
 GTS = f"{SC}/gts"
-NL = "/home/smhan/uve_experiment/seoul_buildings/nodelink"
+NL = "/path/to/raw_data/seoul_buildings/nodelink"
 BBOX = (-10052.5, 477236.5, 275064.6, 632421.6)
 ALPHA = 0.9
 RANK_BASE = {"101": 0.50, "102": 0.60, "103": 0.75, "104": 0.95, "105": 0.90, "106": 0.95, "107": 1.00}
@@ -81,7 +81,7 @@ print(f"{len(code_to_nodeidx)}/{len(our_codes)} codes mapped to graph nodes ({ti
 
 tt = np.load(f"{GTS}/traffic_tensor.npz", allow_pickle=True)
 sensor_link_ids = list(tt["link_ids"])
-vc = np.load("/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
+vc = np.load("/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
 vc_ids = list(vc["link_ids"])
 vc_pos = {lid: i for i, lid in enumerate(vc_ids)}
 sensor_xy = np.array([t_proj.transform(vc["lon"][vc_pos[lid]], vc["lat"][vc_pos[lid]]) for lid in sensor_link_ids])

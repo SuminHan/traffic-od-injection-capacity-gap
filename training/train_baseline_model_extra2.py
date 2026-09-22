@@ -17,7 +17,7 @@ from train_gts_od import KR_HOLIDAYS, TIME_FEAT_DIM, build_windows
 from models_baselines import ODInjectionWrapper, MatureInjectionWrapper, CrossAttnInjectionWrapper
 from models_baselines_extra2 import MODELS_EXTRA2 as MODELS
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 
 def geh_loss(pred_n, target_n, mu, sd, eps=1.0, sqrt_eps=1e-6):

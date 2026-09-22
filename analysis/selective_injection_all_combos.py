@@ -20,7 +20,7 @@ from scipy import stats
 from train_gts_od import KR_HOLIDAYS, TIME_FEAT_DIM, build_windows
 from models_baselines import MODELS, ODInjectionWrapper
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 COMBOS = [

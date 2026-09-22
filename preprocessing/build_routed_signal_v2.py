@@ -3,7 +3,7 @@ forecast (od_signal_ext.npz), producing a 2-channel routed signal: routed_outflo
 routed_forecast before) and routed_inflow (via V, new)."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 TRAFFIC_DAYS = 1308
 
 rw = np.load(f"{GTS}/routing_weights_v2.npz", allow_pickle=True)

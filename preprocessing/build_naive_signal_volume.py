@@ -21,7 +21,7 @@ from pyproj import Transformer
 from scipy.spatial import cKDTree
 from shapely.ops import unary_union
 
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+SC = "/home/ncrc/work"
 GTS = f"{SC}/gts"
 TRAFFIC_DAYS = 1308
 
@@ -49,7 +49,7 @@ origin_xy = np.array(origin_xy)
 valid_origin_idx = np.array(valid_origin_idx)
 print(f"{len(valid_origin_idx)}/{len(our_codes)} origins have geometry")
 
-vc = np.load("/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
+vc = np.load("/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
 vc_ids = list(vc["link_ids"])
 vc_pos = {lid: i for i, lid in enumerate(vc_ids)}
 sensor_xy = np.array([t_proj.transform(vc["lon"][vc_pos[lid]], vc["lat"][vc_pos[lid]]) for lid in sensor_link_ids])

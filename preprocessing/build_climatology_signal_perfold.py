@@ -22,7 +22,7 @@ import json
 import numpy as np
 from datetime import date, timedelta
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 N_HOURS_PER_DAY = 24
 DAY0 = date(2023, 1, 1)
 

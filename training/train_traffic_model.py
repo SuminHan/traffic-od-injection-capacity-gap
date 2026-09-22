@@ -27,7 +27,7 @@ import torch.nn.functional as F
 
 from train_gts_od import KR_HOLIDAYS, TIME_FEAT_DIM, build_windows
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 
 def get_args():
@@ -193,7 +193,7 @@ def main():
              vol_flat[args.train_lo * n_hours:args.train_hi * n_hours].std() + 1e-3
     vol_n = (vol_flat - mu) / sd
 
-    g = np.load("/home/smhan/uve_experiment/pipeline_nowcast/volume_point_graph.npz", allow_pickle=True)
+    g = np.load("/path/to/raw_data/pipeline_nowcast/volume_point_graph.npz", allow_pickle=True)
     g_ids = list(g["link_ids"]); gpos = {lid: i for i, lid in enumerate(g_ids)}
     sel = np.array([gpos[l] for l in link_ids])
     A = g["A"][np.ix_(sel, sel)]

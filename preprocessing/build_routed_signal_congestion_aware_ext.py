@@ -35,7 +35,7 @@ for true per-hour re-simulation -- documented honestly as such.
 import json, glob, sys
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 SIM = f"{GTS}/simulator"
 sys.path.insert(0, SIM)
 

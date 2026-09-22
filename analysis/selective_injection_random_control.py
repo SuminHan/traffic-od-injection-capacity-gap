@@ -22,7 +22,7 @@ the original 30-fold matrix sweep.
 import numpy as np
 import pandas as pd
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 RNG = np.random.RandomState(0)
 N_RANDOM = 200
 

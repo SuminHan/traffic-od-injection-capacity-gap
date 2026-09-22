@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 OUT = f"{GTS}/paper_tkde/figs"
 plt.rcParams.update({"font.size": 9, "font.family": "serif", "axes.grid": True,
                       "grid.alpha": 0.3, "axes.axisbelow": True})

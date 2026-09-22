@@ -13,7 +13,7 @@ import numpy as np
 import networkx as nx
 from gensim.models import Word2Vec
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 EMB_DIM = 16
 P, Q = 2, 1  # return/in-out params (same defaults as libcity_ref)
 NUM_WALKS, WALK_LENGTH, WINDOW = 100, 80, 10

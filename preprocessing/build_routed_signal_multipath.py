@@ -2,7 +2,7 @@
 (Monte Carlo perturbed-Dijkstra stochastic assignment) instead of the single-shortest-path W."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 TRAFFIC_DAYS = 1096
 
 rw = np.load(f"{GTS}/routing_weights_multipath.npz", allow_pickle=True)

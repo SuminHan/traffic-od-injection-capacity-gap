@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SC = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+SC = "/home/ncrc/work"
 GTS = f"{SC}/gts"
 OUT = f"{GTS}/paper_tkde/figs"
 
@@ -25,7 +25,7 @@ dong_sel = dong[dong["code8"].isin(our_codes) | dong["sgg5"].isin({c[:5] for c i
 seoul_boundary = unary_union(dong[dong["code8"].str[:2] == "11"].geometry)
 
 # --- volume sensor locations ---
-vc = np.load("/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
+vc = np.load("/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
 tt = np.load(f"{GTS}/traffic_tensor.npz", allow_pickle=True)
 sensor_link_ids = list(tt["link_ids"])
 vc_pos = {lid: i for i, lid in enumerate(list(vc["link_ids"]))}

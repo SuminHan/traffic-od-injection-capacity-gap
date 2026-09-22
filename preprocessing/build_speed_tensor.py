@@ -3,9 +3,9 @@
 12%). Same interpolation/valid-mask treatment as build_traffic_tensor.py."""
 import numpy as np
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
-vc = np.load("/home/smhan/uve_experiment/pipeline_nowcast/speed_hourly_cache.npz", allow_pickle=True)
+vc = np.load("/path/to/raw_data/pipeline_nowcast/speed_hourly_cache.npz", allow_pickle=True)
 link_ids = list(vc["link_ids"])
 dates = vc["dates"]; hours = vc["hours"]; speed = vc["speed"]  # (396, T)
 n_sensors = speed.shape[0]

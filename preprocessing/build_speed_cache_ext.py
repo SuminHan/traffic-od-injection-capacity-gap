@@ -1,7 +1,7 @@
 """
 Extend the traffic SPEED dataset to 2026-07, mirroring build_volume_cache_ext.py's fix for the
 exact same staleness issue: smhan's pipeline_nowcast/speed_hourly_cache.npz stops at 2025-12-31
-even though /home/smhan/uve_experiment/topis_speed/*.xlsx already has raw files through 2026_07
+even though /path/to/raw_data/topis_speed/*.xlsx already has raw files through 2026_07
 (same "already downloaded but never re-aggregated" gap volume had). Parses the 7 missing months
 directly from the raw xlsx, restricted to the SAME 396 link_ids already in speed_hourly_cache.npz
 (physical sensors -- set doesn't change), and concatenates onto the existing cache. Writes to
@@ -10,9 +10,9 @@ THIS project's own directory -- never touches smhan's original cache or raw file
 import numpy as np
 import openpyxl
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
-TOPIS_DIR = "/home/smhan/uve_experiment/topis_speed"
-SRC_CACHE = "/home/smhan/uve_experiment/pipeline_nowcast/speed_hourly_cache.npz"
+GTS = "/home/ncrc/work/gts"
+TOPIS_DIR = "/path/to/raw_data/topis_speed"
+SRC_CACHE = "/path/to/raw_data/pipeline_nowcast/speed_hourly_cache.npz"
 EXT_MONTHS = [(2026, m) for m in range(1, 8)]  # Jan..Jul 2026
 
 orig = np.load(SRC_CACHE, allow_pickle=True)

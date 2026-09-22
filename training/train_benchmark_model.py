@@ -31,7 +31,7 @@ except Exception:
     _M3 = {}
 MODELS = {**_MODELS_MAIN, **_M2, **_M3}
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 
 def geh_loss(pred_n, target_n, mu, sd, eps=1.0, sqrt_eps=1e-6):

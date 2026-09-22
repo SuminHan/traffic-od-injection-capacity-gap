@@ -1,6 +1,6 @@
 import json
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+GTS = "/home/ncrc/work/gts"
 
 v2 = json.load(open(f"{GTS}/sensor_topk_od_v2.json"))
 sensor_data = v2["sensors"]

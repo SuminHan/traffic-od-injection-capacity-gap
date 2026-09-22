@@ -10,8 +10,8 @@ with a companion validity mask so the training loss can ignore them.
 import numpy as np
 import pandas as pd
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
-SCRATCH = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+GTS = "/home/ncrc/work/gts"
+SCRATCH = "/home/ncrc/work"
 
 sd = pd.read_csv(f"{SCRATCH}/sensor_dong_match.csv")
 od = np.load(f"{GTS}/od_tensor_full.npz", allow_pickle=True)
@@ -21,7 +21,7 @@ sd = sd[sd.code8.isin(code_to_idx)].reset_index(drop=True)
 print(f"{len(sd)} sensors matched to OD's 500-node graph")
 
 vc = np.load(f"{SCRATCH.rsplit('/',1)[0]}/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz"
-             if False else "/home/smhan/uve_experiment/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
+             if False else "/path/to/raw_data/pipeline_nowcast/volume_hourly_cache.npz", allow_pickle=True)
 link_ids = list(vc["link_ids"])
 keep_mask = np.array([lid in set(sd.link_id) for lid in link_ids])
 sel = np.where(keep_mask)[0]

@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 
-GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
-SCRATCH = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad"
+GTS = "/home/ncrc/work/gts"
+SCRATCH = "/home/ncrc/work"
 
 sd = pd.read_csv(f"{SCRATCH}/sensor_dong_match.csv")
 od = np.load(f"{GTS}/od_tensor_full.npz", allow_pickle=True)
