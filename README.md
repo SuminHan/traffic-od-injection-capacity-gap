@@ -3,12 +3,13 @@
 ### A Capacity-Gap Account and a Validation-Gated Remedy
 
 Code, analysis scripts, and result summaries for a submission to *IEEE Transactions on Knowledge
-and Data Engineering* (TKDE). Raw data and trained checkpoints are not included (see
-[`data/README.md`](data/README.md)) — this repo has the code that produced every number and
-figure in the paper, plus the aggregated result files themselves.
+and Data Engineering* (TKDE). Raw data and trained checkpoints are not included — this repo has
+the code that produced every number and figure in the paper, plus the aggregated result files
+themselves.
 
 - **Paper (main body):** [`paper/main.pdf`](paper/main.pdf)
 - **Supplementary material (Appendices A–E):** [`paper/supplement.pdf`](paper/supplement.pdf)
+- **Datasets** (what each one contains, raw file/column schemas, download links): [`data/README.md`](data/README.md)
 - **arXiv:** _add link once posted_
 
 ---
