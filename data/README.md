@@ -4,6 +4,11 @@ Raw data is **not** included in this repository (size, and some sources require 
 access/download process). This page describes what each dataset actually contains — down to the
 raw column/file names the `preprocessing/` scripts parse — and where to get it.
 
+**Samples**: [`samples/`](samples/) has a small, real excerpt of each raw format (~50-150 rows,
+pulled directly from one real downloaded file/day) so you can see the actual shape of the data
+without downloading anything. All three sources are published as open data, so these excerpts
+are not disclosing anything not already public.
+
 ## 1. TOPIS traffic sensors (volume + speed)
 
 - 121 point sensors reporting hourly vehicle volume (vehicles/hour); 396 link-level sensors
@@ -21,9 +26,13 @@ under separate `topis_volume/` and `topis_speed/` directories.
   that hour). `preprocessing/build_volume_cache_ext.py` sums inbound + outbound directions per
   `(site, date)` to get one volume series per site.
 - **Speed**: one row per (date, link), read with `openpyxl` in `read_only` mode. Column 0 is the
-  date, column 3 is the link ID, columns 12–35 are the 24 hourly speed values.
+  date, column 3 is the link ID (`링크아이디`), columns 12–35 are the 24 hourly speed values.
   `preprocessing/build_speed_cache_ext.py` parses this directly (no pandas — the raw files are
   large enough that row-by-row `openpyxl` iteration was faster).
+
+Samples: [`samples/topis_volume_sample.csv`](samples/topis_volume_sample.csv),
+[`samples/topis_speed_sample.csv`](samples/topis_speed_sample.csv) (60 rows each, from
+`2023_01.xlsx`).
 
 **Note on repo scope**: `build_volume_cache_ext.py` / `build_speed_cache_ext.py` in this repo
 *extend* an already-aggregated `volume_hourly_cache.npz` / `speed_hourly_cache.npz` (built by an
@@ -44,20 +53,29 @@ column layout described above.
 **Raw file format.** One zip per day, `movement_<YYMMDD>.zip`, under a `movement_od/<YYYYMM>/`
 directory (e.g. `movement_od/202607/movement_260701.zip`); each zip contains one CSV. Encoding is
 inconsistent across the date range — older files are `cp949`, newer ones `utf-8`
-(`preprocessing/build_od_tensor_full.py` tries `utf-8` first and falls back to `cp949`). Columns
-used:
+(`preprocessing/build_od_tensor_full.py` tries `utf-8` first and falls back to `cp949`). Full raw
+column list, and what our pipeline actually uses:
 
-| column | meaning |
-|---|---|
-| `o_admdong_cd` | origin administrative-dong code |
-| `d_admdong_cd` | destination administrative-dong code |
-| `st_time_cd` | start time code (first 2 digits = hour) |
-| `move_purpose` | trip purpose, 1–7, stored as float-formatted text (`"1.0"`, not `"1"`) — commute/school/shopping/tourism/hospital/home/other; see Appendix E of the paper for a purpose-split analysis using this field |
-| `cnt` | trip count |
+| column | meaning | used? |
+|---|---|---|
+| `o_admdong_cd` | origin administrative-dong code | yes |
+| `d_admdong_cd` | destination administrative-dong code | yes |
+| `st_time_cd` | start time code (first 2 digits = hour) | yes |
+| `fns_time_cd` | end time code | no |
+| `in_forn_div_nm` | domestic/foreign traveler category (`내국인`=domestic, `단기외국인`=short-term foreign, etc.) | no |
+| `forn_citiz_nm` | nationality category (`한국`, `기타`, ...) -- aggregate category, not individual identity | no |
+| `move_purpose` | trip purpose, 1–7, stored as float-formatted text (`"1.0"`, not `"1"`) — commute/school/shopping/tourism/hospital/home/other | yes (only in the purpose-split exploratory analysis, Appendix E) |
+| `move_dist` | trip distance | no |
+| `move_time` | trip duration | no |
+| `cnt` | trip count (already aggregated -- this is not individual-level data) | yes |
+| `etl_ymd` | ETL/processing date | no |
 
 `preprocessing/build_od_tensor_full.py` filters to the 500 administrative-unit codes used in the
 paper (`o_admdong_cd`/`d_admdong_cd` both in the fixed codeset), buckets by hour, and sums `cnt`
 into the `(day, hour, 500, 500)` OD tensor.
+
+Sample: [`samples/movement_od_sample.csv`](samples/movement_od_sample.csv) (60 rows, from
+`movement_od/202301/movement_230101.zip`).
 
 ## 3. Road network
 
@@ -73,6 +91,10 @@ read with `geopandas`. Links carry `F_NODE`/`T_NODE` (from/to node ID), `LENGTH`
 and `LINK_ID`; nodes carry `NODE_ID`. `build_routing_weights.py` builds a directed graph from
 these (weighted by length and a road-hierarchy preference on `ROAD_RANK`) and runs Dijkstra from
 every origin dong's centroid to every TOPIS sensor to get the static routing matrix $W$.
+
+Samples: [`samples/moct_link_sample.geojson`](samples/moct_link_sample.geojson),
+[`samples/moct_node_sample.geojson`](samples/moct_node_sample.geojson) (a small ~5km x 5km
+window in central Seoul, 150 features each -- the full national shapefile is hundreds of MB).
 
 ## Directory layout the preprocessing scripts expect
 
