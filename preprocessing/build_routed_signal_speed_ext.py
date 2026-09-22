@@ -1,0 +1,25 @@
+"""Extended version of build_routed_signal_speed.py: applies routing_weights_speed.npz's W
+(static structural signal, unchanged) to the FULL 2023-01..2026-07 od_signal_ext.npz range now
+that speed_tensor_ext.npz covers the same range, producing routed_od_signal_speed_ext.npz."""
+import numpy as np
+
+GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
+TRAFFIC_DAYS = 1308  # speed_tensor_ext.npz covers 2023-01-01..2026-07-31 (43 months)
+
+rw = np.load(f"{GTS}/routing_weights_speed.npz", allow_pickle=True)
+W = rw["W"]
+rw_codes = list(rw["codes"])
+
+od = np.load(f"{GTS}/od_tensor_full.npz", allow_pickle=True)
+od_codes = [str(int(c)) for c in od["codes"]]
+assert rw_codes == od_codes
+
+sig = np.load(f"{GTS}/od_signal_ext.npz")
+outflow_forecast = sig["pred_outflow"].T[:TRAFFIC_DAYS * 24]  # (T,N)
+routed = outflow_forecast @ W  # (T, 396)
+
+np.savez_compressed(f"{GTS}/routed_od_signal_speed_ext.npz",
+                     routed_forecast=routed.astype(np.float32),
+                     sensor_link_ids=rw["sensor_link_ids"])
+print(f"saved routed_od_signal_speed_ext.npz: {routed.shape}")
+print(f"stats: mean={routed.mean():.2f} std={routed.std():.2f}")

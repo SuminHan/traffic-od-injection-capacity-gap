@@ -1,0 +1,16 @@
+# Best-effort dependency list, collected by scanning imports across the scripts in this repo.
+# The project actually used several separate conda environments for different steps (training
+# vs. figure generation) rather than one pinned environment -- see the README's "Reproducing"
+# section. No exact versions are pinned here; anything reasonably recent should work.
+
+numpy
+pandas
+scipy
+torch
+networkx
+shapely
+geopandas
+pyproj
+matplotlib
+gensim
+openpyxl
