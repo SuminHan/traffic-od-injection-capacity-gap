@@ -119,11 +119,22 @@ def stage_plot():
 
     xs = np.linspace(np.log10(min(r["params"] for r in rows)),
                      np.log10(max(r["params"] for r in rows)), 50)
+
+    # Shade the plot by outcome, not just annotate it: below zero = injection helps (green),
+    # above zero = injection hurts (red). The sign convention (negative %DeltaMSE = improvement)
+    # is easy to misread at a glance without this -- the color field makes "down is good" legible
+    # without the reader having to hold the convention in their head.
+    ymin_data = min(r["pct"] for r in rows)
+    ymax_data = max(r["pct"] for r in rows)
+    ypad = 0.08 * (ymax_data - ymin_data)
+    y_lo, y_hi = ymin_data - ypad, ymax_data + ypad
+    axa.axhspan(y_lo, 0, color="#2f7d52", alpha=0.07, zorder=0)
+    axa.axhspan(0, y_hi, color="#b0402f", alpha=0.07, zorder=0)
+    axa.set_ylim(y_lo, y_hi)
+
     axa.plot(10 ** xs, fit["slope"] * xs + fit["intercept"], "--", color="#888888", lw=1.1, zorder=2)
-    axa.annotate("small models:\ninjection helps", xy=(0.30, 0.04), xycoords="axes fraction",
-                 fontsize=6.3, color="#2f7d52", style="italic", ha="left", va="bottom")
-    axa.annotate("large models:\ninjection hurts", xy=(0.97, 0.94), xycoords="axes fraction",
-                 fontsize=6.3, color="#b0402f", style="italic", ha="right", va="top")
+    axa.annotate("small models: injection helps", xy=(0.97, 0.045), xycoords="axes fraction",
+                 fontsize=6.3, color="#2f7d52", style="italic", ha="right", va="bottom")
     axa.axhline(0, color="black", lw=0.8, zorder=1)
     axa.set_xscale("log")
     axa.set_ylabel("injection effect\n(% $\\Delta$MSE)")
@@ -131,12 +142,23 @@ def stage_plot():
                   f"p={fit['p_rho']:.1g})", fontsize=8.5)
     axa.legend(fontsize=5.6, loc="upper left", framealpha=0.9, ncol=1, handletextpad=0.4,
                labelspacing=0.3)
+    # A few volume points sit close together in (log-params, pct) space; nudge those labels
+    # individually so they don't overlap (everything else uses the default offset).
+    label_offset = {"stgcn": (2, 7), "pdformer": (2, -9),
+                     "dcrnn": (2, 7), "gts": (2, -9)}
     for r in rows:
-        if r["task"] == "volume" and r["model"] in ("stid_fixed", "gman", "gwnet", "agcrn", "mtgnn"):
+        if r["task"] == "volume":
+            dx, dy = label_offset.get(r["model"], (2, 3.5))
             axa.annotate(r["name"], (r["params"], r["pct"]), fontsize=5.8,
-                         xytext=(2, 3.5), textcoords="offset points", color="#333333")
+                         xytext=(dx, dy), textcoords="offset points", color="#333333")
 
     px = [w["plain_params"] for w in within]
+    yb_lo = min(w["lo"] for w in within)
+    yb_hi = max(w["hi"] for w in within)
+    yb_pad = 0.12 * (yb_hi - yb_lo)
+    axb.axhspan(yb_lo - yb_pad, 0, color="#2f7d52", alpha=0.07, zorder=0)
+    axb.axhspan(0, yb_hi + yb_pad, color="#b0402f", alpha=0.07, zorder=0)
+    axb.set_ylim(yb_lo - yb_pad, yb_hi + yb_pad)
     axb.plot(px, [w["pct"] for w in within], "-o", color="#2f7d52", lw=1.3, ms=5, zorder=3)
     axb.fill_between(px, [w["lo"] for w in within], [w["hi"] for w in within],
                      color="#2f7d52", alpha=0.18, zorder=2)
