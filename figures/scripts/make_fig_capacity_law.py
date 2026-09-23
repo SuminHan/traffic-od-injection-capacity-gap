@@ -115,7 +115,8 @@ def stage_stats():
            "fit": {"slope": float(slope), "intercept": float(intercept),
                    "rho": float(rho), "p_rho": float(prho), "n": len(rows)},
            "fit_by_task": fit_by_task,
-           "within_stid": agg.to_dict("records")}
+           "within_stid": agg.to_dict("records"),
+           "ensemble": pd.read_csv(f"{GTS}/ensemble_control_table.csv").to_dict("records")}
     json.dump(out, open(DATA, "w"), indent=1)
     print(f"wrote {DATA}")
     print(f"  between-architecture Spearman rho={rho:.3f} (p={prho:.2g}), n={len(rows)}")
@@ -136,7 +137,7 @@ def stage_plot():
 
     fig = plt.figure(figsize=(7.1, 3.6))
     gs = fig.add_gridspec(1, 3, width_ratios=[1.15, 1.15, 1.0], wspace=0.65,
-                          left=0.105, right=0.985, top=0.76, bottom=0.20)
+                          left=0.105, right=0.975, top=0.76, bottom=0.20)
     axa, axb, axc = fig.add_subplot(gs[0]), fig.add_subplot(gs[1]), fig.add_subplot(gs[2])
 
     def dumbbell(ax, task, title, rho, p_rho):
@@ -145,23 +146,15 @@ def stage_plot():
         ys = np.arange(len(sel))
         for y, r in zip(ys, sel):
             col_od = "#2f7d52" if r["rmse_od"] < r["rmse_plain"] else "#b0402f"
-            col_sel = "#2f7d52" if r["rmse_selective"] < r["rmse_plain"] else "#b0402f"
             ax.annotate("", xy=(r["rmse_od"], y), xytext=(r["rmse_plain"], y),
                         arrowprops=dict(arrowstyle="-|>", color=col_od, alpha=0.8, lw=1.3,
                                          shrinkA=4, shrinkB=4, mutation_scale=9), zorder=2)
-            ax.annotate("", xy=(r["rmse_selective"], y), xytext=(r["rmse_od"], y),
-                        arrowprops=dict(arrowstyle="-|>", color=col_sel, alpha=0.8, lw=1.3,
-                                         linestyle=(0, (2, 1)), shrinkA=4, shrinkB=5,
-                                         mutation_scale=9), zorder=2)
         ax.scatter([r["rmse_plain"] for r in sel], ys, marker="o", s=32,
                    facecolors="white", edgecolors="#333333", linewidths=1.1, zorder=3,
                    label="plain")
         ax.scatter([r["rmse_od"] for r in sel], ys, marker="o", s=32,
                    c=["#2f7d52" if r["rmse_od"] < r["rmse_plain"] else "#b0402f" for r in sel],
                    edgecolors="#333333", linewidths=0.5, zorder=3, label="injected (uniform)")
-        ax.scatter([r["rmse_selective"] for r in sel], ys, marker="D", s=26,
-                   c=["#2f7d52" if r["rmse_selective"] < r["rmse_plain"] else "#b0402f" for r in sel],
-                   edgecolors="#333333", linewidths=0.5, zorder=4, label="injected (selective)")
         ax.set_yticks(ys)
         ax.set_yticklabels([r["name"] for r in sel], fontsize=7.3)
         ax.set_ylim(-0.7, len(sel) - 0.3)
@@ -173,7 +166,7 @@ def stage_plot():
         ax.grid(axis="y", visible=False)
         # widen x-limits a touch so the selective diamond (often the furthest-left point) isn't
         # flush against the axis edge
-        xs_all = [v for r in sel for v in (r["rmse_plain"], r["rmse_od"], r["rmse_selective"])]
+        xs_all = [v for r in sel for v in (r["rmse_plain"], r["rmse_od"])]
         pad = 0.06 * (max(xs_all) - min(xs_all))
         ax.set_xlim(min(xs_all) - pad, max(xs_all) + pad)
 
@@ -183,29 +176,34 @@ def stage_plot():
              fit_by_task["speed"]["rho"], fit_by_task["speed"]["p_rho"])
     handles, labels = axa.get_legend_handles_labels()
     fig.legend(handles, labels, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=3, framealpha=0.9, handletextpad=0.4, columnspacing=1.2)
+               ncol=2, framealpha=0.9, handletextpad=0.4, columnspacing=1.2)
 
-    px = [w["plain_params"] for w in within]
-    yc_lo = min(w["lo"] for w in within)
-    yc_hi = max(w["hi"] for w in within)
-    yc_pad = 0.12 * (yc_hi - yc_lo)
-    axc.axhspan(yc_lo - yc_pad, 0, color="#2f7d52", alpha=0.07, zorder=0)
-    axc.axhspan(0, yc_hi + yc_pad, color="#b0402f", alpha=0.07, zorder=0)
-    axc.set_ylim(yc_lo - yc_pad, yc_hi + yc_pad)
-    axc.plot(px, [w["pct"] for w in within], "-o", color="#2f7d52", lw=1.3, ms=5, zorder=3)
-    axc.fill_between(px, [w["lo"] for w in within], [w["hi"] for w in within],
-                     color="#2f7d52", alpha=0.18, zorder=2)
-    for i, w in enumerate(within):
-        ns_ = w["p"] >= 0.05
-        dx = -22 if i == len(within) - 1 else 3
-        axc.annotate("n.s." if ns_ else "sig.", (w["plain_params"], w["pct"]), fontsize=6,
-                     xytext=(dx, -9 if ns_ else 5), textcoords="offset points", color="#333333")
+    # (c) ensemble-controlled test: gain from using the injected checkpoint as an ensemble partner
+    # instead of a second plain seed, avg(plain, injected) - avg(plain, plain seed 1), % MSE.
+    ens = d["ensemble"]
+    vals = [e["od_gain"] for e in ens]
+    lo, hi = min(vals), max(vals); pad = 0.12 * (hi - lo)
+    axc.axhspan(lo - pad, 0, color="#2f7d52", alpha=0.07, zorder=0)
+    axc.axhspan(0, hi + pad, color="#b0402f", alpha=0.07, zorder=0)
+    axc.set_ylim(lo - pad, hi + pad)
+    for task, mk, col in [("volume", "o", "#2f4f8f"), ("speed", "^", "#b8860b")]:
+        es = [e for e in ens if e["task"] == task]
+        sig = [e for e in es if e["od_gain_q"] < 0.05]
+        ns = [e for e in es if e["od_gain_q"] >= 0.05]
+        axc.scatter([e["params"] for e in sig], [e["od_gain"] for e in sig], marker=mk, s=30, c=col,
+                    zorder=3, label=f"{task} (sig.)")
+        axc.scatter([e["params"] for e in ns], [e["od_gain"] for e in ns], marker=mk, s=30,
+                    facecolors="none", edgecolors=col, linewidths=1.1, zorder=3, label=f"{task} (n.s.)")
+    ours = [e for e in ens if e["model"] == "ours"]
+    for e in ours:
+        axc.annotate("Ours", (e["params"], e["od_gain"]), fontsize=6, xytext=(4, -3),
+                     textcoords="offset points", color="#333333")
     axc.axhline(0, color="black", lw=0.8, zorder=1)
     axc.set_xscale("log")
-    axc.margins(x=0.15)
     axc.set_xlabel("plain-model parameters\n(log scale)", fontsize=8)
-    axc.set_ylabel("injection effect (% $\\Delta$MSE)", fontsize=8)
-    axc.set_title("(c) within STID\n(volume, 30 folds)", fontsize=8.5)
+    axc.set_ylabel("OD partner $-$ seed partner\n(% MSE, 2-model average)", fontsize=7.5)
+    axc.set_title("(c) ensemble-controlled\n$\\rho$=0.77 (p=2.5e-5)", fontsize=8.2)
+    axc.legend(fontsize=5.6, loc="upper left", framealpha=0.9, handletextpad=0.3, labelspacing=0.25)
 
     fig.savefig(f"{OUT}/fig_capacity_law.pdf")
     print(f"wrote {OUT}/fig_capacity_law.pdf")
