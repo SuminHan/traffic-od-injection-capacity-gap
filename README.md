@@ -124,7 +124,7 @@ This is research code, not a packaged library.
   title   = {When Does Population-Mobility {OD} Injection Help Traffic Forecasting?
              A Capacity-Gap Account Across Eleven Models},
   author  = {Han, Sumin},
-  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  journal = {IEEE Transactions on Intelligent Transportation Systems},
   note    = {under review},
   year    = {2026}
 }
