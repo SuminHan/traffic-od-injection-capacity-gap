@@ -4,8 +4,8 @@ by an arrow -- literally "before vs after" rather than a normalized %-change. Sp
 subplots (volume / speed) since the two tasks' RMSE live on completely different scales
 (~300-500 for volume vs ~3-4 for speed) and can't share one axis.
 
-Data: Table 9's own numbers (see main.tex) -- RMSE (inj.) is selective injection for the seven
-architectures it's been tested on, uniform injection (marked) for the one (Ours) it hasn't.
+Data: Table 9's own numbers (see main.tex) -- RMSE (inj.) is validation-gated selective injection
+for all eleven models, including Ours (Section 7.1/Table 9), with no uniform-only exceptions left.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -20,7 +20,7 @@ plt.rcParams.update({"font.size": 10, "font.family": "serif"})
 DATA = [
     ("STID",        "31-35k",  360.7, 342.5, 3.30, 3.25, False),
     ("GMAN",        "55-59k",  504.8, 468.5, 3.46, 3.36, False),
-    ("Ours",        "62k",     410.6, 395.3, 4.03, 3.86, True),
+    ("Ours",        "62k",     410.6, 390.7, 4.03, 3.84, False),
     ("STGCN",       "62-67k",  382.5, 367.6, 3.33, 3.26, False),
     ("PDFormer",    "95-157k", 367.8, 355.6, 3.20, 3.17, False),
     ("STAEformer",  "160-217k",357.1, 349.2, 3.18, 3.16, False),
