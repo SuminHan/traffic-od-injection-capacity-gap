@@ -2,12 +2,12 @@
 
 ### A Capacity-Gap Account Across Eleven Models
 
-Code, analysis scripts, and per-fold results for a submission to *IEEE Transactions on Knowledge
-and Data Engineering* (TKDE). Raw data and trained checkpoints are not included; everything else
+Code, analysis scripts, and per-fold results for a submission to *IEEE Transactions on Intelligent
+Transportation Systems* (T-ITS). Raw data and trained checkpoints are not included; everything else
 behind every number and figure in the paper is here.
 
-- **Paper:** [`paper/main.pdf`](paper/main.pdf) (12 pages)
-- **Supplementary material (Appendices A–E):** [`paper/supplement.pdf`](paper/supplement.pdf)
+- **Paper:** [`paper/main.pdf`](paper/main.pdf) (13 pages, single file -- T-ITS folds appendices
+  into the main manuscript rather than requiring a separate supplementary file)
 - **Datasets** (contents, schemas, download links, samples): [`data/README.md`](data/README.md)
 
 ---
@@ -34,7 +34,7 @@ models — below zero, the signal adds value beyond ensembling.
 
 ![capacity law](figures/rendered/fig_capacity_law.png)
 
-**Table 7 — does the signal add value beyond ensembling?** (MSE change vs. plain, 30 folds; bold =
+**Table VII — does the signal add value beyond ensembling?** (MSE change vs. plain, 30 folds; bold =
 significant after Benjamini–Hochberg correction across all 22 rows):
 
 | Model | Params | Task | Uniform | Avg(plain, injected) | Avg(plain, 2nd seed) | OD partner gain |
@@ -58,16 +58,16 @@ significantly worse. Correlation with log-parameters: ρ=0.77 (p=2.5×10⁻⁵),
 uniform injection (ρ=0.67).
 
 **Checks that bound these claims** (all in the paper):
-- *Calendar confounding* (Table 5): a calendar climatology of the routed signal recovers 87% of the
+- *Calendar confounding* (Table V): a calendar climatology of the routed signal recovers 87% of the
   lightweight model's volume gain and 96% of its speed gain; the calendar-free residual alone
   recovers 34% (volume) / 71% (speed) — speed carries roughly twice the genuine day-specific share.
-- *Selective injection is dominated by averaging* (supplementary Appendix B): the per-sensor
+- *Selective injection is dominated by averaging* (Appendix B): the per-sensor
   selector beats simple averaging in only 1 of 22 combinations. Net of a seed-only selection-noise
   baseline, it is significant in 11 of 20 combinations and reverses in exactly the 3 that uniform
   injection harmed most.
-- *Within-architecture capacity sweep* (Table 8): scaling STID 31k → 419k parameters moves the
+- *Within-architecture capacity sweep* (Table VIII): scaling STID 31k → 419k parameters moves the
   injection effect from −9.02% to +3.37% (significantly harmful).
-- *Cross-dataset replication* (Table 9): the capacity law replicates in direction on three further
+- *Cross-dataset replication* (Table IX): the capacity law replicates in direction on three further
   public benchmarks (PEMS-BAY, METR-LA, PeMSD7) with a calendar signal, reaching significance on
   PEMS-BAY.
 
@@ -75,19 +75,19 @@ uniform injection (ρ=0.67).
 
 | Paper item | Result files (`results/`) | Script |
 |---|---|---|
-| Table 4, Fig. 3 (lightweight model) | `summaries/multi_fold_{traffic,speed}_results_ext.json` | `training/train_traffic_model.py`, `train_speed_model.py` |
-| Table 5 (signal controls, volume) | `summaries/{naive_signal,climatology,od_residual,dual_signal}_ablation_results.json` | `training/run_*_ablation_30.py` |
-| Table 5 (signal controls, speed) | `summaries/speed_calendar_controls_{results.json,summary.csv}` | `preprocessing/build_speed_calendar_controls_30.py`, `training/run_speed_calendar_controls_30.py` |
-| Table 6, Fig. 6a–b (uniform, ten architectures) | `summaries/multi_fold_baseline_*_results_ext30.json` | `training/train_baseline_model*.py` |
-| Table 7, Fig. 6c (ensemble-controlled test) | `per_fold/ensemble_check_*_fold_results.csv`, `summaries/{ensemble_check_summary,ensemble_control_table}.csv` | `analysis/ensemble_baseline_check.py`, `figures/scripts/make_fig_capacity_law.py` |
-| Table 8 (STID capacity sweep) | `summaries/stid_fixed_volume_capacity_sweep_summary.csv` | `training/train_baseline_model_extra2.py` |
-| Table 9 (cross-dataset) | `summaries/{pemsbayh,metrlah,pemsd7h}_capacity_summary.csv` | `training/train_benchmark_model.py` |
-| Suppl. Appendix B (selective injection, in full) | `per_fold/selective_injection_*_fold_results.csv`, `per_fold/seed_control_*_fold_results.csv`, `summaries/freelunch_net_significance.csv` | `analysis/selective_injection_*.py`, `analysis/seed_control_selective_*.py`, `analysis/freelunch_net_significance.py` |
-| Suppl. Appendix B.1 (adaptive threshold) | `per_fold/noise_calibrated_adaptive_*`, `summaries/noise_calibrated_adaptive_full_summary.csv` | `analysis/noise_calibrated_adaptive_full.py` |
-| Suppl. random-selection control | `summaries/selective_injection_random_control_*_summary.csv` | `analysis/selective_injection_random_control*.py` |
+| Table IV, Fig. 3 (lightweight model) | `summaries/multi_fold_{traffic,speed}_results_ext.json` | `training/train_traffic_model.py`, `train_speed_model.py` |
+| Table V (signal controls, volume) | `summaries/{naive_signal,climatology,od_residual,dual_signal}_ablation_results.json` | `training/run_*_ablation_30.py` |
+| Table V (signal controls, speed) | `summaries/speed_calendar_controls_{results.json,summary.csv}` | `preprocessing/build_speed_calendar_controls_30.py`, `training/run_speed_calendar_controls_30.py` |
+| Table VI, Fig. 6a–b (uniform, ten architectures) | `summaries/multi_fold_baseline_*_results_ext30.json` | `training/train_baseline_model*.py` |
+| Table VII, Fig. 6c (ensemble-controlled test) | `per_fold/ensemble_check_*_fold_results.csv`, `summaries/{ensemble_check_summary,ensemble_control_table}.csv` | `analysis/ensemble_baseline_check.py`, `figures/scripts/make_fig_capacity_law.py` |
+| Table VIII (STID capacity sweep) | `summaries/stid_fixed_volume_capacity_sweep_summary.csv` | `training/train_baseline_model_extra2.py` |
+| Table IX (cross-dataset) | `summaries/{pemsbayh,metrlah,pemsd7h}_capacity_summary.csv` | `training/train_benchmark_model.py` |
+| Appendix B (selective injection, in full) | `per_fold/selective_injection_*_fold_results.csv`, `per_fold/seed_control_*_fold_results.csv`, `summaries/freelunch_net_significance.csv` | `analysis/selective_injection_*.py`, `analysis/seed_control_selective_*.py`, `analysis/freelunch_net_significance.py` |
+| Appendix B (adaptive threshold, summarized; full detail in repo only) | `per_fold/noise_calibrated_adaptive_*`, `summaries/noise_calibrated_adaptive_full_summary.csv` | `analysis/noise_calibrated_adaptive_full.py` |
+| Appendix B (random-selection control, summarized; full detail in repo only) | `summaries/selective_injection_random_control_*_summary.csv` | `analysis/selective_injection_random_control*.py` |
 
 STID always refers to the corrected architecture (`stid_fixed` in file names); the first
-implementation had a calendar-embedding bug (Appendix E) and its results are not used.
+implementation had a calendar-embedding bug (Appendix C) and its results are not used.
 
 ## Repository layout
 
@@ -102,7 +102,7 @@ figures/scripts/  regenerate the paper figures from results/
 figures/rendered/ rendered figures
 results/          per-fold and summary result files behind every table
 data/             dataset documentation and small samples (no raw data)
-paper/            main.pdf + supplement.pdf (separate files, per TKDE submission rules)
+paper/            main.pdf (single file, per T-ITS submission rules -- appendices included)
 tools/            internal progress dashboards used during the study (not needed to reproduce)
 ```
 
