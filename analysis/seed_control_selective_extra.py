@@ -50,7 +50,7 @@ CONTROL_SEED = 1
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Architectures live in three registries with three matching training entry points.
-EXTRA2_MODELS = {"stid", "stgcn"}
+EXTRA2_MODELS = {"stid", "stid_fixed", "stgcn"}
 EXTRA_MODELS = {"pdformer", "mtgnn", "agcrn"}
 
 DEFAULT_COMBOS = [
