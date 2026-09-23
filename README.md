@@ -54,8 +54,9 @@ gain (−5.82% / −7.81%) does not exceed uniform injection — selection helps
 - *Calendar confounding* (Table 5): a calendar climatology of the routed signal recovers 87% of the
   lightweight model's uniform gain; the calendar-free residual alone recovers 34%.
 - *Selection noise* (Table 10): net of a seed-only "free lunch" baseline, selective injection stays
-  favorable in 17 of 20 combinations; the 3 exceptions are exactly the 3 that uniform injection
-  harmed most (Graph WaveNet, MTGNN, AGCRN on volume).
+  significantly favorable in 11 of 20 combinations (BH q<0.05) and favorable but not significant in
+  6 more; it reverses in exactly the 3 that uniform injection harmed most (Graph WaveNet, MTGNN,
+  AGCRN on volume).
 - *Within-architecture capacity sweep* (Table 11): scaling STID 31k → 419k parameters moves the
   injection effect from −9.02% to +3.37% (significantly harmful).
 
@@ -68,7 +69,7 @@ gain (−5.82% / −7.81%) does not exceed uniform injection — selection helps
 | Table 6, Fig. 6 (uniform, ten architectures) | `summaries/multi_fold_baseline_*_results_ext30.json` | `training/train_baseline_model*.py`, `figures/scripts/make_fig_capacity_law.py` |
 | Table 8 (selective) | `per_fold/selective_injection_*_fold_results.csv` | `analysis/selective_injection_*.py` |
 | Table 9 (absolute RMSE) | same as Tables 6, 8 | `analysis/selective_injection_ours.py` (Ours row) |
-| Table 10 (free lunch) | `per_fold/seed_control_*_fold_results.csv`, `summaries/seed_control_*_summary.csv` | `analysis/seed_control_selective_*.py`, `training/run_seedctl_*.py` |
+| Table 10 (free lunch) | `per_fold/seed_control_*_fold_results.csv`, `summaries/freelunch_net_significance.csv` | `analysis/seed_control_selective_*.py`, `analysis/freelunch_net_significance.py`, `training/run_seedctl_*.py` |
 | Table 11 (STID sweep) | `summaries/stid_fixed_volume_capacity_sweep_summary.csv` | `training/train_baseline_model_extra2.py` |
 | Suppl. Table 13 (adaptive threshold) | `per_fold/noise_calibrated_adaptive_*`, `summaries/noise_calibrated_adaptive_full_summary.csv` | `analysis/noise_calibrated_adaptive_full.py` |
 | Suppl. Table 14 (cross-dataset) | `summaries/{pemsbayh,metrlah,pemsd7h}_capacity_summary.csv` | `training/train_benchmark_model.py` |
