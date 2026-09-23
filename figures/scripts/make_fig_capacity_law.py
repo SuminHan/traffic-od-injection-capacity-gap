@@ -2,8 +2,9 @@
 
 Three panels:
   (a) BETWEEN architectures, VOLUME -- all ten published/reimplemented architectures at 30 folds,
-      absolute RMSE, plain (open circle) to uniform-injected (filled circle), joined by an arrow
-      colored by direction (green = improved, red = worsened). Rows ordered by parameter count.
+      absolute RMSE as a three-point chain: plain (open circle) -> uniform-injected (filled
+      circle, colored by direction: green improved, red worsened) -> selective-injected (filled
+      diamond, this paper's practical recipe). Rows ordered by parameter count.
   (b) BETWEEN architectures, SPEED -- same design, speed task.
   (c) WITHIN one architecture -- the STID capacity sweep (hidden 64/128/256, 30 folds each, two
       seeds at hidden 64), showing the same decay (in % effect) with architecture, training recipe
@@ -13,8 +14,11 @@ Three panels:
 plain-vs-injected comparison inside a single derived percentage, which was hard to read at a
 glance. Splitting by task and showing the actual before/after RMSE values with an arrow makes the
 capacity effect (small models improve, large models regress) directly visible without requiring
-the reader to mentally invert a percentage's sign convention. The underlying capacity-law
-correlation (Spearman rho vs. log parameters) is preserved as annotated text on each panel.
+the reader to mentally invert a percentage's sign convention. The third point (selective) is drawn
+in the same panel rather than a separate figure, so the recovery is visible right next to the
+uniform-injection failure it recovers from, instead of requiring the reader to cross-reference a
+different figure or table. The underlying capacity-law correlation (Spearman rho vs. log
+parameters, uniform injection) is preserved as annotated text on each panel.
 
 No single conda env on this machine has matplotlib, pandas and scipy together, so this runs in two
 stages: `--stage stats` (trajtok: pandas/scipy) writes fig_capacity_law_data.json, and
@@ -70,12 +74,21 @@ def stage_stats():
             nm = (f.split("/")[-1].replace("multi_fold_", "")
                    .replace("_results_ext30.json", "").replace("baseline_", ""))
             m, t = nm.rsplit("_", 1)
+
+            # selective-injection RMSE, same architecture/task, from the per-fold selector CSVs
+            # (stid_fixed for STID, matching the corrected architecture used everywhere else).
+            sel_name = "stid_fixed" if m == "stid" else m
+            sel_f = f"{GTS}/selective_injection_{sel_name}_{t}_fold_results.csv"
+            sel_df = pd.read_csv(sel_f)
+            rmse_selective = float(np.sqrt(sel_df["mse_selective"]).mean())
+
             rows.append({"model": m, "name": NAME.get(m, m), "task": t,
                          "params": int(by[k0]["plain"]["n_params"]),
                          "pct": float(((O - P) / P * 100).mean()),
                          "p": float(stats.ttest_rel(O, P)[1]),
                          "rmse_plain": float(np.sqrt(P).mean()),
-                         "rmse_od": float(np.sqrt(O).mean())})
+                         "rmse_od": float(np.sqrt(O).mean()),
+                         "rmse_selective": rmse_selective})
         except Exception:
             pass
 
@@ -131,17 +144,24 @@ def stage_plot():
         sel = sorted([r for r in rows if r["task"] == task], key=lambda r: r["params"])
         ys = np.arange(len(sel))
         for y, r in zip(ys, sel):
-            improved = r["rmse_od"] < r["rmse_plain"]
-            col = "#2f7d52" if improved else "#b0402f"
+            col_od = "#2f7d52" if r["rmse_od"] < r["rmse_plain"] else "#b0402f"
+            col_sel = "#2f7d52" if r["rmse_selective"] < r["rmse_plain"] else "#b0402f"
             ax.annotate("", xy=(r["rmse_od"], y), xytext=(r["rmse_plain"], y),
-                        arrowprops=dict(arrowstyle="-|>", color=col, alpha=0.8, lw=1.3,
+                        arrowprops=dict(arrowstyle="-|>", color=col_od, alpha=0.8, lw=1.3,
                                          shrinkA=4, shrinkB=4, mutation_scale=9), zorder=2)
+            ax.annotate("", xy=(r["rmse_selective"], y), xytext=(r["rmse_od"], y),
+                        arrowprops=dict(arrowstyle="-|>", color=col_sel, alpha=0.8, lw=1.3,
+                                         linestyle=(0, (2, 1)), shrinkA=4, shrinkB=5,
+                                         mutation_scale=9), zorder=2)
         ax.scatter([r["rmse_plain"] for r in sel], ys, marker="o", s=32,
                    facecolors="white", edgecolors="#333333", linewidths=1.1, zorder=3,
                    label="plain")
         ax.scatter([r["rmse_od"] for r in sel], ys, marker="o", s=32,
                    c=["#2f7d52" if r["rmse_od"] < r["rmse_plain"] else "#b0402f" for r in sel],
                    edgecolors="#333333", linewidths=0.5, zorder=3, label="injected (uniform)")
+        ax.scatter([r["rmse_selective"] for r in sel], ys, marker="D", s=26,
+                   c=["#2f7d52" if r["rmse_selective"] < r["rmse_plain"] else "#b0402f" for r in sel],
+                   edgecolors="#333333", linewidths=0.5, zorder=4, label="injected (selective)")
         ax.set_yticks(ys)
         ax.set_yticklabels([r["name"] for r in sel], fontsize=7.3)
         ax.set_ylim(-0.7, len(sel) - 0.3)
@@ -151,6 +171,11 @@ def stage_plot():
                      fontsize=7.8)
         ax.grid(axis="x", alpha=0.3)
         ax.grid(axis="y", visible=False)
+        # widen x-limits a touch so the selective diamond (often the furthest-left point) isn't
+        # flush against the axis edge
+        xs_all = [v for r in sel for v in (r["rmse_plain"], r["rmse_od"], r["rmse_selective"])]
+        pad = 0.06 * (max(xs_all) - min(xs_all))
+        ax.set_xlim(min(xs_all) - pad, max(xs_all) + pad)
 
     dumbbell(axa, "volume", "(a) volume: plain $\\to$ injected RMSE",
              fit_by_task["volume"]["rho"], fit_by_task["volume"]["p_rho"])
@@ -158,7 +183,7 @@ def stage_plot():
              fit_by_task["speed"]["rho"], fit_by_task["speed"]["p_rho"])
     handles, labels = axa.get_legend_handles_labels()
     fig.legend(handles, labels, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=2, framealpha=0.9, handletextpad=0.4, columnspacing=1.2)
+               ncol=3, framealpha=0.9, handletextpad=0.4, columnspacing=1.2)
 
     px = [w["plain_params"] for w in within]
     yc_lo = min(w["lo"] for w in within)
