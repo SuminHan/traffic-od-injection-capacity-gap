@@ -133,6 +133,16 @@ def stage_plot():
     axa.set_ylim(y_lo, y_hi)
 
     axa.plot(10 ** xs, fit["slope"] * xs + fit["intercept"], "--", color="#888888", lw=1.1, zorder=2)
+
+    # Draw each point as a movement FROM zero (no injection) TO its measured effect, not just a
+    # dot floating at that height -- makes "this is a change relative to a plain baseline" visible
+    # at a glance instead of implicit in the y-axis label.
+    for r in rows:
+        col = "#2f4f8f" if r["task"] == "volume" else "#b8860b"
+        axa.annotate("", xy=(r["params"], r["pct"]), xytext=(r["params"], 0),
+                     arrowprops=dict(arrowstyle="-|>", color=col, alpha=0.55, lw=1.0,
+                                      shrinkA=0, shrinkB=3, mutation_scale=8), zorder=2)
+
     axa.annotate("small models: injection helps", xy=(0.97, 0.045), xycoords="axes fraction",
                  fontsize=6.3, color="#2f7d52", style="italic", ha="right", va="bottom")
     axa.axhline(0, color="black", lw=0.8, zorder=1)
