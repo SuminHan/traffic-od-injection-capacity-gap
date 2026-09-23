@@ -21,8 +21,8 @@ evaluation, 2023–2026). **Injected uniformly**, it improves a lightweight grap
 helps only the two smallest and is significantly harmful for every architecture above 10⁵
 parameters — a *capacity gap*. **Injected selectively** — a per-sensor choice between the plain and
 injected checkpoint, made on each fold's validation month, with no retraining — it improves all
-eleven models, is significant in 18 of 20 architecture/task combinations, and raises the
-lightweight model's gain to −9.4% / −9.2%.
+eleven models in absolute RMSE and is significant in 18 of 20 architecture/task combinations,
+including 8 of the 10 where uniform injection was significantly harmful.
 
 ## Key results
 
@@ -45,7 +45,10 @@ plain (○) → uniform injection (●, green = better, red = worse) → selecti
 | GTS | 395k | **−5.10%** | −0.19% | **−1.44%** | **+3.86%** |
 | Graph WaveNet | 673k | −0.46% (p=0.36) | **+25.45%** | **−1.87%** | **+3.77%** |
 | AGCRN | 774k | **−1.86%** | **+11.92%** | **−1.45%** | **+0.91%** |
-| *Ours (lightweight)* | 62k | **−9.41%** | **−7.17%** | **−9.23%** | **−8.17%** |
+| *Ours (lightweight)*¹ | 62k | **−9.41%** | **−7.17%** | **−9.23%** | **−8.17%** |
+
+¹ Ours is not part of Table 8; shown for reference. Net of its selection-noise baseline, its selective
+gain (−5.82% / −7.81%) does not exceed uniform injection — selection helps where uniform injection fails.
 
 **Checks that bound these claims** (all in the paper):
 - *Calendar confounding* (Table 5): a calendar climatology of the routed signal recovers 87% of the
