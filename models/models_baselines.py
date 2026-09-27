@@ -1,6 +1,6 @@
 """
 Published-baseline architectures (DCRNN, Graph WaveNet, GMAN), adapted from smhan's clean
-standalone reimplementations at /path/to/raw_data/deep_baselines/{dcrnn,gwnet,gman}.py
+standalone reimplementations at /home/smhan/uve_experiment/deep_baselines/{dcrnn,gwnet,gman}.py
 (themselves distilled from the LibCity reference implementations -- see that directory's
 REFERENCES.md). Those originals target a DIFFERENT task (174 stations, daily P=14/Q=1 direct
 next-day regression); this file keeps every core mechanism (diffusion convolution / WaveNet
@@ -592,6 +592,60 @@ class ODInjectionWrapper(nn.Module):
         B, N, H = h_ctx.shape
         h_ctx_exp = h_ctx.unsqueeze(2).expand(-1, -1, self.q_len, -1) + self.td_proj(td)  # (B,N,Q,H)
         h_od = self.od_proj(od_dec)  # (B,N,Q,H)
+        beta = torch.sigmoid(self.gate_net(torch.cat([h_ctx_exp, h_od], dim=-1)))  # (B,N,Q,1)
+        h_fused = beta * h_ctx_exp + (1 - beta) * h_od
+        self.last_mean_beta = beta.mean().item()
+        return self.step_head(h_fused).squeeze(-1)  # (B,N,Q)
+
+
+class BottleneckODInjectionWrapper(nn.Module):
+    """Pilot for a specific alternative to the capacity-gap account: maybe large models don't
+    fail to benefit from OD injection because the signal is redundant, but because learning to
+    *use* it is harder to find via joint end-to-end optimization inside a large model trained
+    from random init. This wrapper tests the cleanest version of that idea that doesn't require
+    ad-hoc weight-matrix widening: keep the injection pathway (td_proj/od_proj/gate_net/
+    step_head) at a FIXED small width H_inject, independent of the backbone's own hidden size
+    H_backbone, so an already-trained small model's injection pathway (e.g. from a
+    H_backbone=H_inject=64 run, where injection is known to help) can be loaded into it
+    unchanged -- only a new down_proj (H_backbone->H_inject) needs fresh initialization, since it
+    has no small-model analogue (the small model's own context was already H_inject-wide).
+    Forward pass is otherwise identical to ODInjectionWrapper."""
+    def __init__(self, base_model, H_backbone, H_inject, q_len, time_feat_dim):
+        super().__init__()
+        self.base = base_model
+        self.down_proj = nn.Linear(H_backbone, H_inject)
+        self.td_proj = nn.Linear(time_feat_dim, H_inject)
+        self.od_proj = nn.Sequential(nn.Linear(1, H_inject), nn.ReLU(), nn.Linear(H_inject, H_inject))
+        self.gate_net = nn.Sequential(nn.Linear(2 * H_inject, H_inject), nn.ReLU(), nn.Linear(H_inject, 1))
+        self.step_head = nn.Linear(H_inject, 1)
+        self.q_len = q_len
+
+    def load_injection_pathway(self, state_dict):
+        """Loads td_proj/od_proj/gate_net/step_head from another ODInjectionWrapper's state_dict
+        (e.g. a small H_backbone=H_inject model where these keys are the same shape). down_proj
+        and the backbone itself are left as freshly initialized -- they have no small-model
+        analogue."""
+        own = self.state_dict()
+        loaded, skipped = [], []
+        for k, v in state_dict.items():
+            if k.startswith("base.") or k.startswith("down_proj."):
+                continue
+            if k in own and own[k].shape == v.shape:
+                own[k] = v
+                loaded.append(k)
+            else:
+                skipped.append(k)
+        self.load_state_dict(own)
+        return loaded, skipped
+
+    def forward(self, x, stn_idx, od_dec=None, td=None):
+        h_ctx = self.base(x, stn_idx, return_context=True)  # (B,N,H_backbone)
+        if od_dec is None:
+            return self.base.head(h_ctx) if hasattr(self.base, "head") else None
+        B, N, _ = h_ctx.shape
+        h_small = self.down_proj(h_ctx)  # (B,N,H_inject)
+        h_ctx_exp = h_small.unsqueeze(2).expand(-1, -1, self.q_len, -1) + self.td_proj(td)  # (B,N,Q,H_inject)
+        h_od = self.od_proj(od_dec)  # (B,N,Q,H_inject)
         beta = torch.sigmoid(self.gate_net(torch.cat([h_ctx_exp, h_od], dim=-1)))  # (B,N,Q,1)
         h_fused = beta * h_ctx_exp + (1 - beta) * h_od
         self.last_mean_beta = beta.mean().item()

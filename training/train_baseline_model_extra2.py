@@ -14,10 +14,11 @@ import torch
 import torch.nn.functional as F
 
 from train_gts_od import KR_HOLIDAYS, TIME_FEAT_DIM, build_windows
-from models_baselines import ODInjectionWrapper, MatureInjectionWrapper, CrossAttnInjectionWrapper
+from models_baselines import (ODInjectionWrapper, MatureInjectionWrapper, CrossAttnInjectionWrapper,
+                              BottleneckODInjectionWrapper)
 from models_baselines_extra2 import MODELS_EXTRA2 as MODELS
 
-GTS = "/home/ncrc/work/gts"
+GTS = "/tmp/claude-1003/-home-ncrc/4d46e732-0f0f-4fb4-b2b9-74749bd74d73/scratchpad/gts"
 
 
 def geh_loss(pred_n, target_n, mu, sd, eps=1.0, sqrt_eps=1e-6):
@@ -142,6 +143,17 @@ def get_args():
                          "weights) -- use only to quickly gauge whether an idea looks promising "
                          "across a few folds before committing to the real independent-per-fold "
                          "sweep for any number that goes in the paper.")
+    p.add_argument("--inject_bottleneck_dim", type=int, default=0,
+                    help="PILOT ONLY. If >0, use BottleneckODInjectionWrapper instead of "
+                         "ODInjectionWrapper: the injection pathway (td_proj/od_proj/gate_net/"
+                         "step_head) runs at this fixed width regardless of --hidden, with a new "
+                         "down_proj(--hidden -> this) connecting it to the backbone. Requires "
+                         "--fusion_style simple.")
+    p.add_argument("--inject_warmstart_from", type=str, default="",
+                    help="PILOT ONLY, requires --inject_bottleneck_dim: path to a small model's "
+                         "ODInjectionWrapper best.pt (with --hidden == --inject_bottleneck_dim) "
+                         "whose td_proj/od_proj/gate_net/step_head are loaded into the bottleneck "
+                         "before training (down_proj and the backbone stay freshly initialized).")
     return p.parse_args()
 
 
@@ -267,14 +279,26 @@ def main():
         model_kwargs["use_od_graph"] = True
     base_model = MODELS[args.model](A, Fday, n_sensors, H=args.hidden, q_len=Q, **model_kwargs).to(device)
     if args.use_od_injection:
-        wrapper_cls = {"mature": MatureInjectionWrapper, "crossattn": CrossAttnInjectionWrapper,
-                       "simple": ODInjectionWrapper}[args.fusion_style]
-        model = wrapper_cls(base_model, args.hidden, Q, TIME_FEAT_DIM).to(device)
+        if args.inject_bottleneck_dim > 0:
+            assert args.fusion_style == "simple", "--inject_bottleneck_dim requires --fusion_style simple"
+            model = BottleneckODInjectionWrapper(base_model, args.hidden, args.inject_bottleneck_dim,
+                                                  Q, TIME_FEAT_DIM).to(device)
+        else:
+            wrapper_cls = {"mature": MatureInjectionWrapper, "crossattn": CrossAttnInjectionWrapper,
+                           "simple": ODInjectionWrapper}[args.fusion_style]
+            model = wrapper_cls(base_model, args.hidden, Q, TIME_FEAT_DIM).to(device)
     else:
         model = base_model
     if args.warm_start_from:
         model.load_state_dict(torch.load(args.warm_start_from, weights_only=True))
         print(f"[FAST-SCREENING] warm-started from {args.warm_start_from} -- NOT an independent-fold result")
+    if args.inject_warmstart_from:
+        assert args.inject_bottleneck_dim > 0
+        small_sd = torch.load(args.inject_warmstart_from, weights_only=True)
+        loaded, skipped = model.load_injection_pathway(small_sd)
+        print(f"[PILOT] loaded injection pathway from {args.inject_warmstart_from}: "
+              f"{len(loaded)} tensors loaded, {len(skipped)} skipped (shape mismatch/backbone keys)")
+        assert len(loaded) == 12, f"expected 12 injection-pathway tensors, loaded {len(loaded)}: {loaded}"
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
     n_params = sum(p.numel() for p in model.parameters())
     print(f"model={args.model} task={args.task} use_od={bool(args.use_od_injection)} od_graph={bool(args.od_graph)} "
